@@ -1,15 +1,15 @@
 [package]
-name = "${APP}"
-description = "${APP} is a CLI tool"
+name = "shell-scene"
+description = "shell-scene is a CLI tool"
 version = "0.1.0"
 edition = "2021"
-repository = "https://github.com/${GIT_USERNAME}/${APP}"
-homepage = "https://github.com/${GIT_USERNAME}/${APP}"
+repository = "https://github.com/EnigmaCurry/shell-scene"
+homepage = "https://github.com/EnigmaCurry/shell-scene"
 license = "MIT"
 keywords = []
 categories = ["command-line-utilities"]
 readme = "README.md"
-documentation = "https://docs.rs/${APP}"
+documentation = "https://docs.rs/shell-scene"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage,coverage_nightly)'] }

@@ -1,34 +1,64 @@
-# rust-cli-template
+# shell-scene
 
-This is my Rust template for new CLI apps.
+[![Crates.io](https://img.shields.io/crates/v/shell-scene?color=blue
+)](https://crates.io/crates/shell-scene)
+[![Coverage](https://img.shields.io/badge/Coverage-Report-purple)](https://EnigmaCurry.github.io/shell-scene/coverage/master/)
 
-## Features
 
- * [Just](https://github.com/casey/just) enabled project build targets.
- * [Clap](https://docs.rs/clap/latest/clap/) CLI argument parser.
- * Bash / Fish / Zsh shell (tab)
-   [completion](https://docs.rs/clap_complete/latest/clap_complete/).
- * GitHub actions for tests and releases.
- * Test coverage report published to GitHub pages.
- * Publishing to crates.io.
+## Install
 
-## Use this template
+[Download the latest release for your platform.](https://github.com/EnigmaCurry/shell-scene/releases)
 
- * [Create a new repository using this template](https://github.com/new?template_name=rust-cli-template&template_owner=EnigmaCurry).
- * The `Repository name` you choose will also be used as your app name.
- * Go to the repository `Settings` page:
-   * Find `Actions`.
-   * Find `General`.
-   * Find `Workflow Permissions`.
-   * Set `Read and Write permissions`.
-   * Click `Save`.
- * Clone your new repository to your workstation.
- 
-## Render the template
+Or install via cargo ([crates.io/crates/shell-scene](https://crates.io/crates/shell-scene)):
 
 ```
-./setup.sh
+cargo install shell-scene
 ```
- 
-This will render the template into the project root and then
-self-destruct this README.md and the template.
+
+### Tab completion
+
+To install tab completion support, put this in your `~/.bashrc` (assuming you use Bash):
+
+```
+### Bash completion for shell-scene (Put this in ~/.bashrc)
+source <(shell-scene completions bash)
+```
+
+If you don't like to type out the full name `shell-scene`, you can make
+a shorter alias (`h`), as well as enable tab completion for the alias
+(`h`):
+
+```
+### Alias shell-scene as h (Put this in ~/.bashrc):
+alias h=shell-scene
+complete -F _shell-scene -o bashdefault -o default h
+```
+
+Completion for Zsh and/or Fish has also been implemented, but the
+author has not tested this:
+
+```
+### Zsh completion for shell-scene (Put this in ~/.zshrc):
+autoload -U compinit; compinit; source <(shell-scene completions zsh)
+
+### Fish completion for shell-scene (Put this in ~/.config/fish/config.fish):
+shell-scene completions fish | source
+```
+
+## Usage
+
+```
+$ shell-scene
+
+Usage: shell-scene [OPTIONS] [COMMAND]
+
+Commands:
+
+Options:
+  -h, --help                  Print help
+  -V, --version               Print version
+```
+
+## Development
+
+See [DEVELOPMENT.md](DEVELOPMENT.md)

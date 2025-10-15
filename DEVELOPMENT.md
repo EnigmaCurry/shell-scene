@@ -20,9 +20,9 @@ rustup-init ## just press enter when prompted for default selection
 ## Clone source repository
 
 ```
-git clone git@github.com:${GIT_USERNAME}/${APP}.git \
-  ~/git/vendor/${GIT_USERNAME}/${APP}
-cd ~/git/vendor/${GIT_USERNAME}/${APP}
+git clone git@github.com:EnigmaCurry/shell-scene.git \
+  ~/git/vendor/EnigmaCurry/shell-scene
+cd ~/git/vendor/EnigmaCurry/shell-scene
 ```
 
 ## Install development dependencies
@@ -32,7 +32,7 @@ cargo install just
 just deps
 ```
 
-## Build and run development ${APP}
+## Build and run development shell-scene
 
 ```
 just run help
@@ -49,18 +49,18 @@ just build --release
 
 ```
 ## Add this to ~/.bashrc or equivalent:
-alias ${APP}='just -f ~/git/vendor/${GIT_USERNAME}/${APP}/Justfile run'
-alias h=${APP}
+alias shell-scene='just -f ~/git/vendor/EnigmaCurry/shell-scene/Justfile run'
+alias h=shell-scene
 ```
 
-Now you can run `${APP}`, or simply `h`, from any directory, with
+Now you can run `shell-scene`, or simply `h`, from any directory, with
 any arguments, and it will automatically rebuild from source, and then
 run it with those args.
 
 ## Testing
 
 This project has incomplete testing. [See the latest coverage
-report](https://${GIT_USERNAME}.github.io/${APP}/coverage/master/).
+report](https://EnigmaCurry.github.io/shell-scene/coverage/master/).
 
 ## Run tests
 
