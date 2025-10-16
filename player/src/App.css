@@ -1,0 +1,347 @@
+html, body, #root {
+  height: 100%;
+}
+
+#root {
+    width: 100%;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;          /* 🚫 no scrollbars */
+  overscroll-behavior: none; /* prevent pull-to-refresh/scroll chaining */
+}
+
+/* iOS/Safari safe areas (optional) */
+:root {
+  --safe-top: env(safe-area-inset-top);
+  --safe-right: env(safe-area-inset-right);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+  --sidebar-width-closed: 56px;
+  --sidebar-width-open: 280px;
+  --timeline-h: 72px;
+  --sb-btn: 42px;
+}
+
+/* A wrapper that hard-locks the viewport */
+.lock-viewport {
+  position: fixed;
+  inset: 0;          /* top/right/bottom/left: 0 */
+  width: 100vw;
+  height: 100dvh;    /* dynamic viewport fixes mobile URL bar issues */
+  overflow: hidden;
+  background: #000;
+  display: grid;
+  place-items: center;
+  padding: 0;        /* don't add outer padding—can cause overflow */
+}
+
+/* Disable asciinema play button */
+.ap-play-button {
+    display: none;
+}
+
+/* Layout that reserves space for a collapsible left sidebar */
+.app-layout {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  background: #000;
+  overflow: hidden; /* no scroll */
+}
+
+/* Sidebar */
+.sidebar {
+  height: 100dvh;
+  background: #0b0b0e;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  color: #cfd3da;
+  transition: width 200ms ease, transform 200ms ease;
+  overflow: hidden;
+  display: grid;
+}
+
+
+.sidebar.open {
+  width: var(--sidebar-width-open);
+  grid-template-rows: auto auto 1fr;
+}
+
+.sidebar.closed {
+  width: var(--sidebar-width-closed);
+  grid-template-rows: auto 1fr;
+}
+
+/* Toggle button */
+.sb-toggle {
+  margin: 8px;
+  width: var(--sb-btn);
+  height: var(--sb-btn);
+  aspect-ratio: 1 / 1;            /* keep square */
+  display: grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+
+  color: #e6e9ef;                 /* icon color via currentColor */
+  background: #16171c;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.25);
+}
+
+.sb-toggle:hover {
+  background: #1c1d23;
+  border-color: rgba(255,255,255,0.16);
+}
+
+.sb-toggle:active {
+  transform: translateY(0.5px);
+}
+
+.sb-toggle:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(86,172,255,0.6),
+    inset 0 0 0 1px rgba(255,255,255,0.25);
+}
+
+/* Icon sizing + rotation */
+.sb-icon {
+  width: 14px;
+  height: 14px;
+  display: block;                 /* no inline baseline gap */
+  transition: transform 160ms ease, opacity 160ms ease;
+  transform-origin: 50% 50%;
+  opacity: 0.92;
+}
+
+/* Header */
+.sb-header {
+  padding: 8px 12px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9aa1ac;
+  opacity: 0.9;
+}
+
+/* Chapter list */
+.sb-list {
+  overflow-y: auto;
+  padding: 6px;
+  display: grid;
+  gap: 6px;
+}
+.sb-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #e6e9ef;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sb-item:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.06);
+}
+.sb-item.active {
+  background: linear-gradient(180deg, rgba(62,112,255,0.12), rgba(62,112,255,0.06));
+  border-color: rgba(86,130,255,0.35);
+}
+.sb-title { font-size: 14px; }
+.sb-time  { font-size: 12px; opacity: 0.75; }
+
+/* Stage (player area) */
+.stage {
+  position: relative;
+  flex: 1;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000;
+  min-height: 0;
+}
+.stage:focus { outline: none; }
+
+/* Collapsed sidebar: show vertical, readable labels */
+.sidebar.closed { width: 56px; } /* a tad wider so letters aren’t clipped */
+
+.sidebar.closed .sb-header {
+    display: none !important;
+}
+.sidebar.open .sb-header { 
+  display: block;             /* ensure visible when open */
+}
+.sidebar.open   .sb-icon { transform: rotate(0deg);     }
+.sidebar.closed .sb-icon { transform: rotate(-90deg);    }
+/* Make each chapter button a tall tile and rotate its title vertically */
+/* The list fills the available column height (row 3 in your .sidebar grid) */
+.sidebar.closed .sb-list {
+  --gap: 8px;
+  height: 100%;
+  padding: 6px 4px;
+  display: grid;
+  gap: var(--gap);
+  grid-auto-flow: row;
+  min-height: 0;
+  /* Split the list height evenly across all chapters, accounting for gaps */
+  grid-auto-rows: calc((100% - var(--gap) * (var(--chapters) - 1)) / var(--chapters));
+  overflow: hidden; /* no scroll in collapsed mode */
+}
+
+.sidebar.closed .sb-item {
+  position: relative;
+  padding: 6px 2px;
+  display: grid;
+  place-items: center;
+}
+
+/* Hide timestamps when collapsed */
+.sidebar.closed .sb-time { display: none; }
+
+/* Collapsed: counter-clockwise 90° with ellipsis */
+.sidebar.closed .sb-title {
+  /* vertical box so text-overflow works */
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 1em 0 0;
+
+  /* make it read bottom→top like notebook tabs */
+  transform: rotate(180deg);
+
+  /* ensure the ellipsis box matches the tile */
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* rotate glyphs back upright while keeping bottom→top flow */
+.sidebar.closed .sb-title > span {
+  display: inline-block;
+  transform: rotate(0deg);
+}
+
+/* Fallback for engines without vertical writing-mode support */
+@supports not (writing-mode: vertical-rl) {
+  .sidebar.closed .sb-title {
+    transform: rotate(-90deg);      /* CCW */
+    transform-origin: 50% 50%;
+    writing-mode: initial;
+    /* bound width so ellipsis still works when rotated */
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+.sidebar.closed .sb-title::after {
+  /* Optional subtle spacing compensation after rotate */
+  content: "";
+  display: inline-block;
+  width: 0.5ch;
+}
+
+/* Keep the active highlight visible in the narrow layout */
+.sidebar.closed .sb-item.active {
+  background: linear-gradient(180deg, rgba(62,112,255,0.16), rgba(62,112,255,0.08));
+  border-color: rgba(86,130,255,0.35);
+}
+
+/* Optional: nicer scrollbar for the vertical list */
+.sidebar .sb-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.25) transparent;
+}
+.sidebar .sb-list::-webkit-scrollbar { width: 6px; }
+.sidebar .sb-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 6px; }
+
+/* Primary pre-play overlay */
+.overlay-primary {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  /* fade */
+  opacity: 1;
+  transition: opacity 200ms ease;
+}
+
+.overlay-primary.show { opacity: 1; }
+.overlay-primary.fade-out { opacity: 0; pointer-events: none; }
+
+.overlay-text {
+  font-size: clamp(14px, 2.4vmin, 20px);
+  color: #e6e9ef;
+  opacity: 0.85;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+  user-select: none;
+}
+
+/* Flash icons (play/pause) */
+@keyframes flash-pop {
+  0%   { opacity: 0; transform: scale(0.9); }
+  15%  { opacity: 1; transform: scale(1.0); }
+  85%  { opacity: 1; transform: scale(1.0); }
+  100% { opacity: 0; transform: scale(1.02); }
+}
+
+.overlay-flash {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.overlay-icon {
+  fill: #ffffff;
+  width: min(22vmin, 220px);
+  height: auto;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.65));
+}
+
+.flash-icon {
+  width: min(22vmin, 220px);
+  height: auto;
+  fill: #ffffff;
+  opacity: 0.95;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.6));
+  animation: flash-pop 550ms ease both;
+}
+
+.overlay-flash.play .flash-icon  { /* same animation; keep class hooks for future tweaks */ }
+.overlay-flash.pause .flash-icon { }
+
+.player-host {
+    position: relative;
+    height: 100dvh;
+    padding-bottom: var(--timeline-h);
+    box-sizing: border-box;
+}
+.click-surface { touch-action: manipulation; }
+
+@media (max-height: 520px) {
+    .sidebar.closed { width: 48px; }
+    .sidebar.closed .sb-list { --gap: 6px; }
+    .sidebar.closed .sb-title { font-size: clamp(9px, 1.5vh, 11px); }
+    .sidebar.closed .sb-header { display: none; }
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/terminal.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>shell-scene</title>
+    <script>
+      // Minimal global so timelines can self-register without a rebuild:
+      window.shellScene = {
+      _map: Object.create(null),
+      _titles: Object.create(null),
+      registerTimeline(name, timeline, title) {
+      this._map[name] = timeline;
+      this._titles[name] = title || name;
+      },
+      getTimeline(name) { return this._map[name]; },
+      list() { return Object.keys(this._map).sort(); },
+      title(name) { return this._titles[name] || name; }
+      };
+    </script>
+    <script type="module">
+      // Registry of existing timelines.
+      async function loadRegistry() {
+      const res = await fetch('/timelines/registry.json', {cache: 'no-store'});
+      if (!res.ok) return;
+      const { modules } = await res.json();
+      // Eager load them all (or lazy-load as the user opens one)
+      await Promise.all(modules.map((m) => import(m)));
+      // Now they’re all registered in window.shellScene
+      }
+      loadRegistry().catch(console.error);
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

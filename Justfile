@@ -118,6 +118,7 @@ release:
 # Clean all artifacts
 clean *args: clean-profile
     cargo clean {{args}}
+    rm -rf player/dist/ player/public/speech player/public/timelines
 
 # Clean profile artifacts only
 clean-profile:
