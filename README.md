@@ -88,10 +88,15 @@ $ shell-scene
 Usage: shell-scene [OPTIONS] [COMMAND]
 
 Commands:
+  record       Record an asciicast via ttyd
+  completions  Generates shell completions script (tab completion)
+  help         Print this message or the help of the given subcommand(s)
 
 Options:
-  -h, --help                  Print help
-  -V, --version               Print version
+      --log <LEVEL>  Sets the log level, overriding the RUST_LOG environment variable. [possible values: trace, debug, info, warn, error]
+  -v                 Sets the log level to debug.
+  -h, --help         Print help
+  -V, --version      Print version
 ```
 
 ## Development
