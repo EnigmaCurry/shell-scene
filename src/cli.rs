@@ -202,3 +202,44 @@ pub fn print_completion_instructions(binary_name: &str) {
     eprintln!("### Fish (~/.config/fish/config.fish)\n  {binary_name} completions fish | source\n");
     eprintln!("### Zsh (~/.zshrc)\n  autoload -U compinit; compinit; source <({binary_name} completions zsh)");
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Helper: make a command using a stable name for tests.
+    fn test_cmd() -> Command {
+        // If your app() takes a name, use app("shell-scene"); otherwise just app()
+        #[allow(unused_mut)]
+        let mut cmd = { app("shell-scene") };
+        // sanity: no panics when building help
+        let _ = cmd.render_help();
+        cmd
+    }
+
+    #[test]
+    fn record_kill_flag_true_when_present_without_value() {
+        let cmd = test_cmd();
+        let m = cmd
+            .clone()
+            .try_get_matches_from(["shell-scene", "record", "--kill-on-detach"])
+            .expect("parse should succeed");
+        let sub = m.subcommand().expect("has sub");
+        assert_eq!(sub.0, "record");
+        let kill = *sub.1.get_one::<bool>("kill_on_detach").unwrap_or(&false);
+        assert!(kill, "flag without value should imply true");
+    }
+
+    #[test]
+    fn record_kill_flag_false_when_zero_value() {
+        let cmd = test_cmd();
+        let m = cmd
+            .clone()
+            .try_get_matches_from(["shell-scene", "record", "--kill-on-detach=0"])
+            .expect("parse should succeed");
+        let sub = m.subcommand().expect("has sub");
+        assert_eq!(sub.0, "record");
+        let kill = *sub.1.get_one::<bool>("kill_on_detach").unwrap_or(&true);
+        assert!(!kill, "explicit =0 should parse as false");
+    }
+}
