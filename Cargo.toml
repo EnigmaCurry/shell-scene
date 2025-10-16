@@ -1,8 +1,8 @@
 [package]
 name = "shell-scene"
-description = "shell-scene is a CLI tool"
+description = "shell-scene records your terminal sessions and creates web presentations featuring them."
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 repository = "https://github.com/EnigmaCurry/shell-scene"
 homepage = "https://github.com/EnigmaCurry/shell-scene"
 license = "MIT"
@@ -15,16 +15,15 @@ documentation = "https://docs.rs/shell-scene"
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage,coverage_nightly)'] }
 
 [dependencies]
-clap = "4.5.17"
-clap_complete = "4.5.29"
-dirs = "5.0.1"
-env_logger = "0.11.5"
-log = "0.4.22"
+clap = { version = "4", features = ["derive","env"] }
+clap_complete = "4.5.59"
+dirs = "6.0.0"
+env_logger = "0.11.8"
+log = "0.4.28"
+which = "8"
+ctrlc = "3"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+libc = "0.2.177"
 
 [dev-dependencies]
 shell-words = "1.1.0"
-
-[build-dependencies]
-clap = "4.5.17"
-clap_complete = "4.5.29"
-dirs = "5.0.1"

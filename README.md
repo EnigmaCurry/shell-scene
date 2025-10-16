@@ -4,18 +4,53 @@
 )](https://crates.io/crates/shell-scene)
 [![Coverage](https://img.shields.io/badge/Coverage-Report-purple)](https://EnigmaCurry.github.io/shell-scene/coverage/master/)
 
+# shell-scene
 
-## Install
+shell-scene records your terminal sessions and creates web
+presentations featuring them.
+
+## Install dependencies
+
+This software is developed and tested on GNU/Linux. Support for other
+operating systems is not a priority right now.
+
+### Required packages
+
+ * [asciinema](https://docs.asciinema.org/manual/cli/installation/)
+ * [tmux](https://github.com/tmux/tmux/wiki/Installing)
+ * [ttyd](https://github.com/tsl0922/ttyd?tab=readme-ov-file#installation)
+ * [uv](https://docs.astral.sh/uv/)
+
+On Fedora Linux:
+
+```
+sudo dnf install asciinema tmux ttyd uv
+```
+
+On Arch Linux:
+
+```
+sudo pacman -S asciinema tmux ttyd uv
+```
+
+On other Linux distros, asciinema and tmux are probably available in
+your package manager, but you may need to manually install
+[uv](https://docs.astral.sh/uv/) and build
+[ttyd](https://github.com/tsl0922/ttyd?tab=readme-ov-file#install-on-linux)
+yourself.
+
+## Install shell-scene
 
 [Download the latest release for your platform.](https://github.com/EnigmaCurry/shell-scene/releases)
 
-Or install via cargo ([crates.io/crates/shell-scene](https://crates.io/crates/shell-scene)):
+Or build and install via cargo
+([crates.io/crates/shell-scene](https://crates.io/crates/shell-scene)):
 
 ```
 cargo install shell-scene
 ```
 
-### Tab completion
+## Tab completion
 
 To install tab completion support, put this in your `~/.bashrc` (assuming you use Bash):
 
