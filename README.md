@@ -4,8 +4,6 @@
 )](https://crates.io/crates/shell-scene)
 [![Coverage](https://img.shields.io/badge/Coverage-Report-purple)](https://EnigmaCurry.github.io/shell-scene/coverage/master/)
 
-# shell-scene
-
 shell-scene records your terminal sessions and creates web
 presentations featuring them.
 
