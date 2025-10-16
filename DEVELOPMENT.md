@@ -87,6 +87,20 @@ just clippy --fix
 
 ## Release (Github actions)
 
+### Create crates.io API token
+
+ * Go to the crates.io [API Tokens](https://crates.io/settings/tokens)
+   page.
+ * Create a new token with the following scopes: `publish-new`,
+   `publish-update`, `yank`. Scope the permission to just the crate
+   name of your app.
+ * Copy the generated token.
+ * In your GitHub repository settings, under `Secrets and variables`,
+   add a new secret value named `CARGO_REGISTRY_TOKEN` containing your
+   token as the value.
+ * In the Actions general settings, change `Workflow permissions` to
+   `Read and write permissions`.
+
 ### Install cargo dependencies
 
 ```
