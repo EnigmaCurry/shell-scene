@@ -12,7 +12,7 @@ presentations featuring them.
 This software is developed and tested on GNU/Linux. Support for other
 operating systems is not a priority right now.
 
-### Required packages
+### Required system packages
 
  * [asciinema](https://docs.asciinema.org/manual/cli/installation/)
  * [tmux](https://github.com/tmux/tmux/wiki/Installing)
