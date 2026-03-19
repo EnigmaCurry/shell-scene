@@ -114,6 +114,11 @@ pub fn record_flow(
         let _ = run_tmux(&["-L", &sock, "kill-server"]);
     }
 
+    if rc == 0 {
+        eprintln!("\n[shell-scene] Recording complete: {}", ascii_out.display());
+        eprintln!("[shell-scene] You may close this window.");
+    }
+
     rc
 }
 
