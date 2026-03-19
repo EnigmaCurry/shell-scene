@@ -12,6 +12,8 @@ import {HashRouter as Router, Routes, Route, Link, Navigate, useParams} from "re
 import {getCastDurationSeconds} from "./getCastDuration";
 import {ChapterSidebar} from "./ChapterSidebar";
 import { useTimelineRegistry, getTimeline } from "./timelines/runtime";
+import { collectAudioUrls, precacheAudio, rewriteTimelineUrls } from "./utils/audioCache";
+import type { CacheProgress } from "./utils/audioCache";
 
 const fps = 30;
 const isOverlap = (name: string) => name !== "cut" && name !== "fade";
@@ -43,6 +45,28 @@ function PlayerShell({ timeline }: { timeline: TimelineItem[] }) {
   const flashTimerRef = useRef<number | null>(null);
   const lastToggleRef = useRef(0);
   const surfRef = useRef<PD>({down:false,moved:false,x:0,y:0,shouldToggle:false});
+
+  // --- Audio pre-caching ---
+  const [cacheProgress, setCacheProgress] = useState<CacheProgress | null>(null);
+  const [cachedTimeline, setCachedTimeline] = useState<TimelineItem[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const urls = collectAudioUrls(timeline);
+    if (urls.length === 0) {
+      setCachedTimeline(timeline);
+      return;
+    }
+    precacheAudio(urls, (p) => {
+      if (!cancelled) setCacheProgress(p);
+    }).then((urlMap) => {
+      if (!cancelled) setCachedTimeline(rewriteTimelineUrls(timeline, urlMap));
+    }).catch((err) => {
+      console.warn("[audioCache] precache failed, continuing with original URLs:", err);
+      if (!cancelled) setCachedTimeline(timeline);
+    });
+    return () => { cancelled = true; };
+  }, [timeline]);
 
   const setFlashFor = (playing: boolean) => {
     if (flashTimerRef.current) {
@@ -294,7 +318,7 @@ function PlayerShell({ timeline }: { timeline: TimelineItem[] }) {
     const total = Math.max(1, sumBase - sumOverlap);
 
     const input: WebCompositionProps = {
-      timeline,
+      timeline: cachedTimeline!,
       clipFrames,
       isPlaying,
       theme: "asciinema",
@@ -302,7 +326,7 @@ function PlayerShell({ timeline }: { timeline: TimelineItem[] }) {
     };
 
     return {durationInFrames: total, inputProps: input, cardStartsVisible, cardMeta, clipRanges};
-  }, [timeline, clipFrames, isPlaying]);
+  }, [timeline, cachedTimeline, clipFrames, isPlaying]);
 
   // --- When reaching the end, rewind to start and pause instead of looping ---
   useEffect(() => {
@@ -596,6 +620,36 @@ function PlayerShell({ timeline }: { timeline: TimelineItem[] }) {
   }, []);
 
   if (!clipFrames || !inputProps) return <div style={{color: "#fff"}}>Loading…</div>;
+
+  if (!cachedTimeline) {
+    const pct = cacheProgress && cacheProgress.total > 0
+      ? Math.round((cacheProgress.done / cacheProgress.total) * 100)
+      : 0;
+    return (
+      <div style={{
+        position: "fixed", inset: 0, background: "#000",
+        display: "grid", placeItems: "center", color: "#e6e9ef",
+      }}>
+        <div style={{textAlign: "center", width: "min(80%, 360px)"}}>
+          <div style={{fontSize: 14, marginBottom: 12, opacity: 0.85}}>
+            Caching audio… {cacheProgress ? `${cacheProgress.done}/${cacheProgress.total}` : ""}
+          </div>
+          <div style={{
+            height: 6, borderRadius: 3,
+            background: "rgba(255,255,255,0.15)",
+            overflow: "hidden",
+          }}>
+            <div style={{
+              height: "100%", borderRadius: 3,
+              background: "rgba(86,172,255,0.9)",
+              width: `${pct}%`,
+              transition: "width 120ms ease",
+            }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Player fit: whichever dimension is tighter (16:9)
   const compW = 1920;
